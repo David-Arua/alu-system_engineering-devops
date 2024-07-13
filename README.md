@@ -1,1 +1,1 @@
-This is just a  README file
+this is just a README file
