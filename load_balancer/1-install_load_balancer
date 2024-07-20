@@ -8,17 +8,21 @@ WEB01_IP=23.20.18.79
 WEB02_IP=34.228.30.61
 
 # Update package lists
+echo "Updating package lists..."
 sudo apt-get update
 
 # Install HAProxy
+echo "Installing HAProxy..."
 sudo apt-get install -y haproxy
 
 # Backup the original HAProxy configuration file if it exists
 if [ -f /etc/haproxy/haproxy.cfg ]; then
+    echo "Backing up the original HAProxy configuration..."
     sudo mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 fi
 
 # Write the new HAProxy configuration
+echo "Writing the new HAProxy configuration..."
 sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOT
 global
     daemon
@@ -41,9 +45,11 @@ backend webservers
 EOT
 
 # Set the hostname for HAProxy server
+echo "Setting the hostname for the HAProxy server..."
 sudo hostnamectl set-hostname ${STUDENT_ID}-haproxy
 
 # Enable and restart HAProxy service
+echo "Enabling and restarting HAProxy service..."
 sudo systemctl enable haproxy
 sudo systemctl restart haproxy
 
@@ -55,5 +61,10 @@ fi
 chmod 600 ~/.ssh/school
 
 # Set the hostnames for web servers
-ssh -i ~/.ssh/school ubuntu@${WEB01_IP} "sudo hostnamectl set-hostname ${STUDENT_ID}-web-01"
-ssh -i ~/.ssh/school ubuntu@${WEB02_IP} "sudo hostnamectl set-hostname ${STUDENT_ID}-web-02"
+echo "Setting hostname for web-01..."
+ssh -i ~/.ssh/school ubuntu@${WEB01_IP} "sudo hostnamectl set-hostname ${STUDENT_ID}-web-01" || { echo "Failed to set hostname for web-01"; exit 1; }
+
+echo "Setting hostname for web-02..."
+ssh -i ~/.ssh/school ubuntu@${WEB02_IP} "sudo hostnamectl set-hostname ${STUDENT_ID}-web-02" || { echo "Failed to set hostname for web-02"; exit 1; }
+
+echo "Script completed successfully."
