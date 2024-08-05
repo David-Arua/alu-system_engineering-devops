@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#Script to run apache2 on docker container
+if sudo service apache2 status | grep -q "apache2 is running"; then
+    echo "apache2 is already running"
+else
+    # If Apache is not running, start it
+    sudo service apache2 start
+    echo "apache2 has been started"
+fi
